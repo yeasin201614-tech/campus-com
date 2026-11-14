@@ -1,0 +1,76 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 228 45% 98%;
+    --foreground: 232 72% 16%;
+    --card: 0 0% 100%;
+    --card-foreground: 232 72% 16%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 232 72% 16%;
+    --primary: 232 72% 22%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 253 84% 57%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 228 33% 94%;
+    --muted-foreground: 222 18% 45%;
+    --accent: 168 76% 41%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 228 28% 89%;
+    --input: 228 28% 89%;
+    --ring: 253 84% 57%;
+    --radius: 0.9rem;
+  }
+
+  .dark {
+    --background: 231 59% 9%;
+    --foreground: 226 40% 96%;
+    --card: 231 54% 13%;
+    --card-foreground: 226 40% 96%;
+    --popover: 231 54% 13%;
+    --popover-foreground: 226 40% 96%;
+    --primary: 253 84% 62%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 232 55% 24%;
+    --secondary-foreground: 226 40% 96%;
+    --muted: 231 44% 18%;
+    --muted-foreground: 225 22% 69%;
+    --accent: 168 76% 41%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 72% 52%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 231 38% 22%;
+    --input: 231 38% 22%;
+    --ring: 253 84% 62%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased selection:bg-purple/20 selection:text-purple;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+}
+
+.campus-gradient {
+  background: linear-gradient(135deg, #101B62 0%, #37259D 50%, #6038ED 100%);
+}
+
+.campus-btn-gradient {
+  background: linear-gradient(135deg, #4F2CE6 0%, #6038ED 55%, #754FF5 100%);
+}
+
+.campus-glass {
+  background: rgba(255, 255, 255, 0.84);
+  backdrop-filter: blur(14px);
+}
+
+.dark .campus-glass {
+  background: rgba(17, 23, 59, 0.84);
+}

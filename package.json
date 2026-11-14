@@ -1,0 +1,20 @@
+{
+  "name": "campus-com-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Campus.com — Connect • Collaborate • Grow. Multi-university campus community and management platform.",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "dev:web": "npm run dev --workspace=@campus/web",
+    "build:web": "npm run build --workspace=@campus/web",
+    "lint:web": "npm run lint --workspace=@campus/web",
+    "typecheck:web": "npm run typecheck --workspace=@campus/web",
+    "dev:mobile": "npm run start --workspace=@campus/mobile",
+    "typecheck:mobile": "npm run typecheck --workspace=@campus/mobile",
+    "typecheck:shared": "npm run typecheck --workspace=@campus/shared",
+    "typecheck": "npm run typecheck:shared && npm run typecheck:web && npm run typecheck:mobile"
+  }
+}

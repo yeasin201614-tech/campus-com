@@ -1,0 +1,27 @@
+{
+  "expo": {
+    "name": "Campus.com",
+    "slug": "campus-com",
+    "version": "1.0.0",
+    "scheme": "campuscom",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.campus.app"
+    },
+    "android": {
+      "package": "com.campus.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#101B62"
+      }
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
