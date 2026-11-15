@@ -2140,7 +2140,7 @@ ON CONFLICT (slug) DO NOTHING;
 INSERT INTO public.departments (id, university_id, name, code, slug, description, building, contact_email)
 VALUES
   ('44444444-4444-4444-8444-444444444401', '33333333-3333-4333-8333-333333333301', 'Computer Science & AI', 'CSE', 'computer-science-ai', 'Software engineering, artificial intelligence, and distributed systems.', 'Turing Hall', 'cse@northbridge.edu'),
-  ('44444444-4444-4444-8444-444444444402', '33333333-3333-4333-8444-444444444401', 'Business & Economics', 'BBA', 'business-economics', 'Finance, management science, and startup incubation.', 'Keynes Center', 'business@northbridge.edu'),
+  ('44444444-4444-4444-8444-444444444402', '33333333-3333-4333-8333-333333333301', 'Business & Economics', 'BBA', 'business-economics', 'Finance, management science, and startup incubation.', 'Keynes Center', 'business@northbridge.edu'),
   ('44444444-4444-4444-8444-444444444403', '33333333-3333-4333-8333-333333333302', 'Electrical & Robotics Engineering', 'EEE', 'electrical-robotics', 'Embedded systems, autonomous robotics, and clean energy.', 'Tesla Wing', 'eee@metrotech.edu'),
   ('44444444-4444-4444-8444-444444444404', '33333333-3333-4333-8333-333333333303', 'Interactive Media & Design', 'IMD', 'interactive-media-design', 'Human-computer interaction, product design, and digital storytelling.', 'Studio North', 'design@pacificcrest.edu')
 ON CONFLICT (university_id, code) DO NOTHING;
