@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
+  Modal,
   RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -26,7 +29,9 @@ import {
   ShoppingBag,
   TrendingUp,
   UserCheck,
+  UserPlus,
   Users,
+  X,
 } from "lucide-react-native";
 import { useAuth } from "@/context/AuthContext";
 import { useAppTheme } from "@/context/ThemeContext";
@@ -40,6 +45,12 @@ interface MetricStats {
   totalEvents: number;
   totalCommunities: number;
 }
+
+const UNIVERSITIES_LIST = [
+  { id: "33333333-3333-4333-8333-333333333301", name: "Northbridge University" },
+  { id: "33333333-3333-4333-8333-333333333302", name: "Metropolitan Institute of Tech" },
+  { id: "33333333-3333-4333-8333-333333333303", name: "Pacific Crest University" },
+];
 
 export default function MobileAdminCommandCenter() {
   const router = useRouter();
@@ -55,6 +66,73 @@ export default function MobileAdminCommandCenter() {
     totalEvents: 0,
     totalCommunities: 0,
   });
+
+  const [modalOpen, setModalOpen] = useState(false);
+  const [newStudentName, setNewStudentName] = useState("");
+  const [newStudentEmail, setNewStudentEmail] = useState("");
+  const [newStudentPass, setNewStudentPass] = useState("CampusStudent2026!");
+  const [newStudentId, setNewStudentId] = useState("");
+  const [selectedUniId, setSelectedUniId] = useState(UNIVERSITIES_LIST[0].id);
+  const [creatingStudent, setCreatingStudent] = useState(false);
+
+  async function handleCreateStudent() {
+    if (!newStudentName.trim() || !newStudentEmail.trim() || !newStudentPass) {
+      Alert.alert("Missing Information", "Please enter student name, email, and password.");
+      return;
+    }
+    setCreatingStudent(true);
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email: newStudentEmail.trim(),
+        password: newStudentPass,
+        options: {
+          data: {
+            full_name: newStudentName.trim(),
+            requested_role: "student",
+            university_id: selectedUniId,
+            student_id_number: newStudentId.trim(),
+          },
+        },
+      });
+      if (error) {
+        Alert.alert("Error Creating Student", error.message);
+        return;
+      }
+      if (data?.user) {
+        await supabase
+          .from("profiles")
+          .update({
+            full_name: newStudentName.trim(),
+            global_role: "student",
+            is_verified: true,
+            primary_university_id: selectedUniId,
+          })
+          .eq("id", data.user.id);
+
+        if (newStudentId.trim()) {
+          await supabase.from("student_records").insert({
+            university_id: selectedUniId,
+            user_id: data.user.id,
+            student_id_number: newStudentId.trim(),
+            verification_status: "verified",
+          });
+        }
+      }
+      Alert.alert(
+        "Student Created Successfully",
+        `Created student account for ${newStudentName.trim()}!\n\nEmail: ${newStudentEmail.trim()}\nPassword: ${newStudentPass}`
+      );
+      setModalOpen(false);
+      setNewStudentName("");
+      setNewStudentEmail("");
+      setNewStudentId("");
+      loadAdminStats();
+    } catch (e: unknown) {
+      Alert.alert("Error", e instanceof Error ? e.message : "Failed to create student account.");
+    } finally {
+      setCreatingStudent(false);
+    }
+  }
 
   async function loadAdminStats() {
     try {
@@ -158,6 +236,20 @@ export default function MobileAdminCommandCenter() {
           </Text>
         </View>
 
+        {/* Quick Action: Add Student */}
+        <TouchableOpacity
+          style={styles.addStudentBtn}
+          onPress={() => setModalOpen(true)}
+        >
+          <View style={styles.addStudentIconWrap}>
+            <UserPlus size={20} color="#FFFFFF" />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.addStudentTitle}>+ Add New Student Account</Text>
+            <Text style={styles.addStudentSub}>Directly provision student credentials & university profile</Text>
+          </View>
+        </TouchableOpacity>
+
         {/* Metrics Grid */}
         <Text style={[styles.sectionHeading, { color: theme.text }]}>Platform Metrics</Text>
         {loading ? (
@@ -241,6 +333,108 @@ export default function MobileAdminCommandCenter() {
           </Text>
         </View>
       </ScrollView>
+
+      {/* Create Student Modal */}
+      <Modal visible={modalOpen} animationType="slide" transparent>
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, { backgroundColor: theme.card, borderColor: theme.border }]}>
+            <View style={styles.modalHeader}>
+              <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+                <UserPlus size={20} color="#19B99A" />
+                <Text style={[styles.modalTitle, { color: theme.text }]}>Add New Student</Text>
+              </View>
+              <TouchableOpacity onPress={() => setModalOpen(false)} style={styles.modalCloseBtn}>
+                <X size={20} color={theme.muted} />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView contentContainerStyle={{ gap: 12 }}>
+              <View>
+                <Text style={[styles.inputLabel, { color: theme.muted }]}>Student Full Name</Text>
+                <TextInput
+                  value={newStudentName}
+                  onChangeText={setNewStudentName}
+                  placeholder="e.g. Emily Watson"
+                  placeholderTextColor={theme.muted}
+                  style={[styles.modalInput, { color: theme.text, borderColor: theme.border, backgroundColor: theme.background }]}
+                />
+              </View>
+
+              <View>
+                <Text style={[styles.inputLabel, { color: theme.muted }]}>University Email</Text>
+                <TextInput
+                  value={newStudentEmail}
+                  onChangeText={setNewStudentEmail}
+                  placeholder="student@northbridge.edu"
+                  placeholderTextColor={theme.muted}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  style={[styles.modalInput, { color: theme.text, borderColor: theme.border, backgroundColor: theme.background }]}
+                />
+              </View>
+
+              <View>
+                <Text style={[styles.inputLabel, { color: theme.muted }]}>Initial Password</Text>
+                <TextInput
+                  value={newStudentPass}
+                  onChangeText={setNewStudentPass}
+                  placeholder="Password"
+                  placeholderTextColor={theme.muted}
+                  style={[styles.modalInput, { color: theme.text, borderColor: theme.border, backgroundColor: theme.background }]}
+                />
+              </View>
+
+              <View>
+                <Text style={[styles.inputLabel, { color: theme.muted }]}>Student ID Number (Optional)</Text>
+                <TextInput
+                  value={newStudentId}
+                  onChangeText={setNewStudentId}
+                  placeholder="e.g. STU-2026-089"
+                  placeholderTextColor={theme.muted}
+                  style={[styles.modalInput, { color: theme.text, borderColor: theme.border, backgroundColor: theme.background }]}
+                />
+              </View>
+
+              <View>
+                <Text style={[styles.inputLabel, { color: theme.muted, marginBottom: 4 }]}>University</Text>
+                {UNIVERSITIES_LIST.map((u) => (
+                  <TouchableOpacity
+                    key={u.id}
+                    onPress={() => setSelectedUniId(u.id)}
+                    style={[
+                      styles.modalUniPill,
+                      {
+                        borderColor: selectedUniId === u.id ? "#19B99A" : theme.border,
+                        backgroundColor: selectedUniId === u.id ? "rgba(25, 185, 154, 0.12)" : theme.background,
+                      },
+                    ]}
+                  >
+                    <Text style={{ fontSize: 13, fontWeight: "600", color: theme.text }}>{u.name}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              <View style={{ flexDirection: "row", gap: 10, marginTop: 8 }}>
+                <TouchableOpacity
+                  style={[styles.modalCancelBtn, { borderColor: theme.border }]}
+                  onPress={() => setModalOpen(false)}
+                >
+                  <Text style={{ fontWeight: "700", color: theme.text }}>Cancel</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.modalSubmitBtn, { backgroundColor: "#19B99A" }]}
+                  onPress={handleCreateStudent}
+                  disabled={creatingStudent}
+                >
+                  <Text style={styles.modalSubmitText}>
+                    {creatingStudent ? "Creating..." : "Create Account"}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -319,4 +513,73 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   sectionTitle: { fontSize: 13, fontWeight: "800" },
+  addStudentBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    backgroundColor: "#19B99A",
+    borderRadius: 16,
+    padding: 14,
+  },
+  addStudentIconWrap: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: "rgba(255, 255, 255, 0.25)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  addStudentTitle: { color: "#FFFFFF", fontSize: 15, fontWeight: "800" },
+  addStudentSub: { color: "rgba(255, 255, 255, 0.85)", fontSize: 11, marginTop: 2 },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.55)",
+    justifyContent: "center",
+    padding: 18,
+  },
+  modalContent: {
+    borderRadius: 22,
+    borderWidth: 1,
+    padding: 18,
+    maxHeight: "85%",
+  },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 14,
+  },
+  modalTitle: { fontSize: 17, fontWeight: "800" },
+  modalCloseBtn: { padding: 4 },
+  inputLabel: { fontSize: 12, fontWeight: "700", marginBottom: 4 },
+  modalInput: {
+    height: 44,
+    borderRadius: 12,
+    borderWidth: 1,
+    paddingHorizontal: 12,
+    fontSize: 14,
+  },
+  modalUniPill: {
+    borderWidth: 1,
+    borderRadius: 10,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    marginBottom: 6,
+  },
+  modalCancelBtn: {
+    flex: 1,
+    height: 44,
+    borderRadius: 12,
+    borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  modalSubmitBtn: {
+    flex: 1,
+    height: 44,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  modalSubmitText: { color: "#FFFFFF", fontSize: 14, fontWeight: "800" },
 });
