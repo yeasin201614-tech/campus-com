@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import { Bell, CalendarDays, Megaphone, ShoppingBag, Users } from "lucide-react-native";
+import { Bell, CalendarDays, Megaphone, ShieldCheck, ShoppingBag, Users } from "lucide-react-native";
 import { BrandLogo } from "@/components/BrandLogo";
 import { useAuth } from "@/context/AuthContext";
 import { useAppTheme } from "@/context/ThemeContext";
@@ -51,6 +51,38 @@ export default function MobileHomeScreen() {
             <Bell size={20} color={theme.text} />
           </TouchableOpacity>
         </View>
+
+        {/* Super Admin Control Center Banner */}
+        {profile?.global_role === "super_admin" && (
+          <TouchableOpacity
+            onPress={() => router.push("/admin" as any)}
+            style={{
+              backgroundColor: "#101B62",
+              borderRadius: 20,
+              padding: 16,
+              borderWidth: 1.5,
+              borderColor: "#6038ED",
+              gap: 8,
+            }}
+          >
+            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+              <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+                <ShieldCheck size={18} color="#19B99A" />
+                <Text style={{ color: "#FFFFFF", fontSize: 13, fontWeight: "800" }}>Super Admin Command Center</Text>
+              </View>
+              <View style={{ backgroundColor: "#6038ED", paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8 }}>
+                <Text style={{ color: "#FFFFFF", fontSize: 10, fontWeight: "800" }}>ADMIN MODE</Text>
+              </View>
+            </View>
+            <Text style={{ color: "#CBD5E1", fontSize: 12 }}>
+              Platform telemetry, 20 management modules, user verifications & metrics.
+            </Text>
+            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 4 }}>
+              <Text style={{ color: "#19B99A", fontSize: 11, fontWeight: "700" }}>4 Users • 3 Campuses • Live DB</Text>
+              <Text style={{ color: "#FFFFFF", fontSize: 12, fontWeight: "800" }}>Open Dashboard →</Text>
+            </View>
+          </TouchableOpacity>
+        )}
 
         <View style={styles.heroCard}>
           <Text style={styles.heroGreeting}>Hello, {firstName}!</Text>

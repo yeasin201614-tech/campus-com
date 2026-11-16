@@ -46,6 +46,24 @@ export default function MobileProfileScreen() {
           )}
         </View>
 
+        {profile?.global_role === "super_admin" && (
+          <TouchableOpacity
+            onPress={() => router.push("/admin" as any)}
+            style={[styles.card, { backgroundColor: "#101B62", borderColor: "#6038ED", borderWidth: 1.5 }]}
+          >
+            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+              <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+                <ShieldCheck size={20} color="#19B99A" />
+                <Text style={{ fontWeight: "800", color: "#FFFFFF", fontSize: 14 }}>Admin Command Center</Text>
+              </View>
+              <Text style={{ color: "#19B99A", fontSize: 12, fontWeight: "800" }}>Manage →</Text>
+            </View>
+            <Text style={{ color: "#CBD5E1", fontSize: 12, marginTop: 4 }}>
+              Access full 20 modules, university telemetry & user roles.
+            </Text>
+          </TouchableOpacity>
+        )}
+
         <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border, flexDirection: "row", justifyContent: "space-between", alignItems: "center" }]}>
           <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
             <Moon size={18} color="#6038ED" />
